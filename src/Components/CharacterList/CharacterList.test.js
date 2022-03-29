@@ -1,32 +1,10 @@
 import { render, screen } from "@testing-library/react";
-import CharacterList from "./index";
 import { rest } from "msw";
-import { setupServer } from "msw/node";
+import { server } from "../../mocks/server";
 import { MemoryRouter } from "react-router-dom";
+import CharacterList from "./index";
 
-beforeAll(() => server.listen());
-afterEach(() => server.resetHandlers());
-afterAll(() => server.close());
-
-const server = setupServer(
-  rest.get("https://swapi.dev/api/people/", (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        results: [
-          {
-            name: "Luke Skywalker",
-            gender: "male",
-            homeworld: "https://swapi.dev/api/planets/1/",
-            url: "https://swapi.dev/api/people/1/",
-          },
-        ],
-      })
-    );
-  })
-);
-
-describe("render characters", () => {
+describe("Render CharacterList component", () => {
   it("should render character name for Luke Skywalker when api responses", async () => {
     render(<CharacterList />, { wrapper: MemoryRouter });
     expect(await screen.findByText("Luke Skywalker")).toBeInTheDocument();
@@ -35,15 +13,15 @@ describe("render characters", () => {
     render(<CharacterList />, { wrapper: MemoryRouter });
     expect(await screen.findByText("Gender: male")).toBeInTheDocument();
   });
-  it("should render home planet for character Luke Skywalker when api responses", async () => {
+  it("should render home planet Tatooine for character Luke Skywalker when api responses", async () => {
     render(<CharacterList />, { wrapper: MemoryRouter });
     expect(
-      await screen.findByText("Home planet: https://swapi.dev/api/planets/1/")
+      await screen.findByText("Home Planet: Tatooine")
     ).toBeInTheDocument();
   });
   it("should render error message when fetch fails", async () => {
-    const server = setupServer(
-      rest.get("https://swapi.dev/api/people/", (req, res, ctx) => {
+    server.use(
+      rest.get("https://swapi.dev/api/", (req, res, ctx) => {
         return res(ctx.status(400));
       })
     );

@@ -1,0 +1,25 @@
+.characterContainer {
+  display: flex;
+  flex-direction: column;
+  border-radius: 30px;
+  background-color: var(--bg-box);
+  padding: 1.5rem 4rem 1.5rem 4rem;
+  -webkit-box-shadow: 5px 5px 14px -2px #5c5c5c;
+  box-shadow: 5px 5px 14px -4px #5c5c5c;
+}
+#h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+.h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 1rem 0 0 0;
+}
+ul {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}

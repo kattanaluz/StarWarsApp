@@ -1,7 +1,7 @@
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
-import CharacterList from "../CharacterList";
 import CharacterDetails from "../CharacterDetails";
+import CharacterList from "../CharacterList";
 
 function App() {
   return (

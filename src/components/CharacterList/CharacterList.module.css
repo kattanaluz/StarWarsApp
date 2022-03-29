@@ -1,0 +1,17 @@
+.characterListWrapper {
+  padding: 1.5rem 1rem 1.5rem 1rem;
+  border-radius: 20px;
+  background-color: var(--bg-box);
+  text-align: center;
+  -webkit-box-shadow: 5px 5px 14px -2px #5c5c5c;
+  box-shadow: 5px 5px 14px -4px #5c5c5c;
+}
+.links {
+  color: #000;
+  font-weight: 900;
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+.links:hover {
+  text-decoration: underline;
+}
