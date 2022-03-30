@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import style from "./CharacterList.module.css";
 
 export default function CharacterList() {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [characters, setCharacters] = useState(undefined);
   const [planets, setPlanets] = useState([]);
 
@@ -26,14 +28,18 @@ export default function CharacterList() {
         planetsData.forEach((promise) => {
           getPlanets(promise);
         });
+
+        setLoading(false);
       } catch (error) {
-        console.error(error);
+        setError(error);
       }
     }
     fetchData();
   }, []);
 
-  if (characters && planets && planets.length > 0) {
+  if (loading && !error) {
+    return <p>Loading...</p>;
+  } else if (!loading || (characters && planets && planets.length > 0)) {
     return characters.map((item, index) => {
       const id = item.url.slice(29);
       return (
@@ -46,7 +52,7 @@ export default function CharacterList() {
         </div>
       );
     });
-  } else {
-    return <p>Loading...</p>;
+  } else if (error) {
+    return <p>Failed trying to fetch data</p>;
   }
 }

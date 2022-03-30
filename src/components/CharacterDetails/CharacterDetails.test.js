@@ -1,43 +1,61 @@
-import { render, screen } from "@testing-library/react";
+import {
+  render,
+  screen,
+  waitForElementToBeRemoved,
+} from "@testing-library/react";
 import { rest } from "msw";
 import { server } from "../../mocks/server";
 import CharacterDetails from "./index";
+import { MemoryRouter } from "react-router-dom";
 
-describe("Render CharacterDetails component", () => {
-  it("should render character name for C-3PO when api responses", async () => {
-    render(<CharacterDetails />);
-    expect(await screen.findByText("C-3PO")).toBeInTheDocument();
-  });
-  it("should render hair colour n/a for character C-3PO when api responses", async () => {
-    render(<CharacterDetails />);
-    expect(await screen.findByText("Hair colour: n/a")).toBeInTheDocument();
-  });
-  it("should render eye colour yellow for character C-3PO when api responses", async () => {
-    render(<CharacterDetails />);
-    expect(await screen.findByText("Eye colour: yellow")).toBeInTheDocument();
-  });
-  it("should render gender n/a for character C-3PO when api responses", async () => {
-    render(<CharacterDetails />);
-    expect(await screen.findByText("Gender: n/a")).toBeInTheDocument();
-  });
-  it("should render home planet Tatooine for character C-3PO when api responses", async () => {
-    render(<CharacterDetails />);
+describe("Renders CharacterDetails component", () => {
+  it("renders correctly", async () => {
+    render(<CharacterDetails propId={1} />, { wrapper: MemoryRouter });
+    await waitForElementToBeRemoved(() => screen.queryByText("Loading..."));
     expect(
-      await screen.findByText("Home planet: Tatooine")
+      await screen.findByRole("heading", { level: 1 })
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { level: 2 })
     ).toBeInTheDocument();
   });
-  it("should render list of films for character C-3PO when api responses", async () => {
-    render(<CharacterDetails />);
-    expect(await screen.findByText("Return of the Jedi")).toBeInTheDocument();
+  it("displays loading message before fetches data", () => {
+    render(<CharacterDetails propId={1} />, { wrapper: MemoryRouter });
+    expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
-  it("should render error message when fetch fails", async () => {
+  it("displays character's details when fetches data", async () => {
+    render(<CharacterDetails propId={1} />, { wrapper: MemoryRouter });
+    await waitForElementToBeRemoved(() => screen.queryByText("Loading..."));
+    expect(await screen.findByText(/Luke Skywalker/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Home planet: Tatooine/i)
+    ).toBeInTheDocument();
+    expect(await screen.findByText(/Hair colour: blond/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Gender: male/i)).toBeInTheDocument();
+  });
+  it("displays character's films when fetches data", async () => {
+    render(<CharacterDetails propId={1} />, { wrapper: MemoryRouter });
+    await waitForElementToBeRemoved(() => screen.queryByText("Loading..."));
+    expect(await screen.findByText(/A New Hope/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Home planet: Tatooine/i)
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(/The Empire Strikes Back/i)
+    ).toBeInTheDocument();
+    expect(await screen.findByText(/Return of the Jedi/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Revenge of the Sith/i)).toBeInTheDocument();
+  });
+  it("displays error message when fetch fails", async () => {
     server.use(
-      rest.get("https://swapi.dev/api/people/:id", (req, res, ctx) => {
-        const { id } = req.params;
-        return res(ctx.status(400));
+      rest.get("https://swapi.dev/api/people/1", (req, res, ctx) => {
+        return res(ctx.status(500));
       })
     );
-    render(<CharacterDetails />);
-    expect(await screen.findByText("Loading...")).toBeInTheDocument();
+    render(<CharacterDetails propId={1} />, { wrapper: MemoryRouter });
+    await waitForElementToBeRemoved(() => screen.queryByText("Loading..."));
+    expect(
+      await screen.findByText("Failed trying to fetch data")
+    ).toBeInTheDocument();
   });
 });

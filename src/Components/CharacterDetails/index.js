@@ -2,10 +2,18 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import style from "./CharacterDetails.module.css";
 
-export default function CharacterDetails() {
+export default function CharacterDetails({ propId }) {
   const params = useParams();
-  const { id } = params;
+  let id = undefined;
 
+  if (params.id) {
+    id = params.id;
+  } else {
+    id = propId;
+  }
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [character, setCharacter] = useState();
   const [planet, setPlanet] = useState();
   const [films, setFilms] = useState([]);
@@ -35,14 +43,18 @@ export default function CharacterDetails() {
         filmsData.forEach((promise) => {
           getFilms(promise);
         });
+
+        setLoading(false);
       } catch (error) {
-        console.error(error);
+        setError(error);
       }
     }
     fetchData();
   }, []);
 
-  if (character && planet && films && films.length > 0) {
+  if (loading && !error) {
+    return <p>Loading...</p>;
+  } else if (!loading || (character && planet && films && films.length > 0)) {
     return (
       <div className={style.characterContainer}>
         <h1 id={style.h1}>{character.name}</h1>
@@ -62,8 +74,8 @@ export default function CharacterDetails() {
         </ul>
       </div>
     );
-  } else {
-    return <p>Loading...</p>;
+  } else if (error) {
+    return <p>Failed trying to fetch data</p>;
   }
 }
 
