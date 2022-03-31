@@ -5,7 +5,7 @@ import CharacterList from "../CharacterList";
 
 function App() {
   return (
-    <div className="App">
+    <div data-testid="test-app" className="App">
       <Routes>
         <Route path="/" element={<CharacterList />} />
         <Route path="/character/:id" element={<CharacterDetails />} />

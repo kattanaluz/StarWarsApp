@@ -16,10 +16,7 @@ describe("Renders CharacterList component", () => {
       10
     );
   });
-  it("displays loading message before fetches data", async () => {
-    render(<CharacterList />, { wrapper: MemoryRouter });
-    expect(screen.getByText("Loading...")).toBeInTheDocument();
-  });
+
   it("displays character's name when fetches data", async () => {
     render(<CharacterList />, { wrapper: MemoryRouter });
     await waitForElementToBeRemoved(() => screen.queryByText("Loading..."));
@@ -34,6 +31,7 @@ describe("Renders CharacterList component", () => {
     expect(await screen.findByText(/Biggs Darklighter/i)).toBeInTheDocument();
     expect(await screen.findByText(/Obi-Wan Kenobi/i)).toBeInTheDocument();
   });
+
   it("displays character's gender when fetches data", async () => {
     render(<CharacterList />, { wrapper: MemoryRouter });
     await waitForElementToBeRemoved(() => screen.queryByText("Loading..."));
@@ -41,6 +39,7 @@ describe("Renders CharacterList component", () => {
     expect(await screen.findAllByText(/Gender: female/i)).toHaveLength(2);
     expect(await screen.findAllByText("Gender: n/a")).toHaveLength(3);
   });
+
   it("displays character's home planets when fetches data", async () => {
     render(<CharacterList />, { wrapper: MemoryRouter });
     await waitForElementToBeRemoved(() => screen.queryByText("Loading..."));
@@ -53,6 +52,12 @@ describe("Renders CharacterList component", () => {
     ).toBeInTheDocument();
     expect(await screen.findByText(/Home Planet: Naboo/i)).toBeInTheDocument();
   });
+
+  it("displays loading message before fetches data", async () => {
+    render(<CharacterList />, { wrapper: MemoryRouter });
+    expect(screen.getByText("Loading...")).toBeInTheDocument();
+  });
+
   it("displays error message when fetch fails", async () => {
     server.use(
       rest.get("https://swapi.dev/api/people/", (req, res, ctx) => {

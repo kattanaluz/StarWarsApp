@@ -4,18 +4,16 @@ import style from "./CharacterDetails.module.css";
 
 export default function CharacterDetails({ propId }) {
   const params = useParams();
-  let id = undefined;
+  let characterId = undefined;
 
-  if (params.id) {
-    id = params.id;
-  } else {
-    id = propId;
-  }
+  params.id ? (characterId = params.id) : (characterId = propId);
+
+  const URL = `https://swapi.dev/api/people/${characterId}`;
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [character, setCharacter] = useState();
-  const [planet, setPlanet] = useState();
+  const [character, setCharacter] = useState(undefined);
+  const [planet, setPlanet] = useState(undefined);
   const [films, setFilms] = useState([]);
 
   async function getFilms(promise) {
@@ -24,37 +22,48 @@ export default function CharacterDetails({ propId }) {
   }
 
   useEffect(() => {
+    let isCancelled = false;
     async function fetchData() {
       try {
-        //fetch all data for character
-        const characterData = await fetch(`https://swapi.dev/api/people/${id}`);
+        //fetch all data for a single character
+        const characterData = await fetch(URL);
         const character = await characterData.json();
-        setCharacter(character);
+        if (!isCancelled) {
+          setCharacter(character);
+        }
 
-        //fetch character planet using endpoint from previous fetch data
+        //fetch a single planet using endpoint from previous fetch data
         const planetData = await fetch(`${character.homeworld}`);
         const planet = await planetData.json();
-        setPlanet(planet.name);
+        if (!isCancelled) {
+          setPlanet(planet.name);
+        }
 
         //fetch all films using multiple endpoints from previous fetch data
         const filmsData = await Promise.all(
           character.films.map((films) => fetch(films))
         );
-        filmsData.forEach((promise) => {
-          getFilms(promise);
-        });
-
-        setLoading(false);
+        if (!isCancelled) {
+          filmsData.forEach((promise) => {
+            getFilms(promise);
+          });
+          setLoading(false);
+        }
       } catch (error) {
         setError(error);
       }
     }
     fetchData();
+
+    //cleanup function
+    return () => {
+      isCancelled = true;
+    };
   }, []);
 
   if (loading && !error) {
-    return <p>Loading...</p>;
-  } else if (!loading || (character && planet && films && films.length > 0)) {
+    return <p className={style.loadingFailParagraph}>Loading...</p>;
+  } else if (!loading || (character && planet && films.length > 0)) {
     return (
       <div className={style.characterContainer}>
         <h1 id={style.h1}>{character.name}</h1>
@@ -64,10 +73,10 @@ export default function CharacterDetails({ propId }) {
         <p>Gender: {character.gender}</p>
         <h2 className={style.h2}>Character Films:</h2>
         <ul>
-          {films.map((item) => {
+          {films.map((film, index) => {
             return (
-              <li className={style.listItem} key={item}>
-                {item}
+              <li className={style.listItem} key={film + index}>
+                {film}
               </li>
             );
           })}
@@ -75,25 +84,8 @@ export default function CharacterDetails({ propId }) {
       </div>
     );
   } else if (error) {
-    return <p>Failed trying to fetch data</p>;
+    return (
+      <p className={style.loadingFailParagraph}>Failed trying to fetch data</p>
+    );
   }
 }
-
-/* interface CharacterList {
-    name: string;
-    height: string;
-    mass: string;
-    hair_color: string;
-    skin_color: string;
-    eye_color: string;
-    birth_year: string;
-    gender: string;
-    homeworld: string;
-    films: string[];
-    species: string[];
-    vehicles: string[];
-    starships: string[];
-    created: string;
-    edited: string;
-    url: string;
-  } */

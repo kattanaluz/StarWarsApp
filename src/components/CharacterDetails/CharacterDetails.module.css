@@ -4,8 +4,8 @@
   border-radius: 30px;
   background-color: var(--bg-box);
   padding: 1.5rem 4rem 1.5rem 4rem;
-  -webkit-box-shadow: 5px 5px 14px -2px #5c5c5c;
-  box-shadow: 5px 5px 14px -4px #5c5c5c;
+  -webkit-box-shadow: 5px 5px 20px -3px #000000;
+  box-shadow: 5px 5px 20px -3px #000000;
 }
 #h1 {
   font-size: 1.5rem;
@@ -22,4 +22,7 @@ ul {
   padding: 0;
   margin: 0;
   list-style-type: none;
+}
+.loadingFailParagraph {
+  color: var(--white-text);
 }

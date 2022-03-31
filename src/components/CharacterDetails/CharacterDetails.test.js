@@ -11,6 +11,7 @@ import { MemoryRouter } from "react-router-dom";
 describe("Renders CharacterDetails component", () => {
   it("renders correctly", async () => {
     render(<CharacterDetails propId={1} />, { wrapper: MemoryRouter });
+
     await waitForElementToBeRemoved(() => screen.queryByText("Loading..."));
     expect(
       await screen.findByRole("heading", { level: 1 })
@@ -18,10 +19,6 @@ describe("Renders CharacterDetails component", () => {
     expect(
       await screen.findByRole("heading", { level: 2 })
     ).toBeInTheDocument();
-  });
-  it("displays loading message before fetches data", () => {
-    render(<CharacterDetails propId={1} />, { wrapper: MemoryRouter });
-    expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
   it("displays character's details when fetches data", async () => {
     render(<CharacterDetails propId={1} />, { wrapper: MemoryRouter });
@@ -45,6 +42,10 @@ describe("Renders CharacterDetails component", () => {
     ).toBeInTheDocument();
     expect(await screen.findByText(/Return of the Jedi/i)).toBeInTheDocument();
     expect(await screen.findByText(/Revenge of the Sith/i)).toBeInTheDocument();
+  });
+  it("displays loading message before fetches data", () => {
+    render(<CharacterDetails propId={1} />, { wrapper: MemoryRouter });
+    expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
   it("displays error message when fetch fails", async () => {
     server.use(

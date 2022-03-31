@@ -8,51 +8,70 @@ export default function CharacterList() {
   const [characters, setCharacters] = useState(undefined);
   const [planets, setPlanets] = useState([]);
 
+  const URL = "https://swapi.dev/api/people/";
+
   async function getPlanets(promise) {
     const data = await promise.json();
     setPlanets((planets) => [...planets, data.name]);
   }
 
   useEffect(() => {
+    let isCancelled = false;
+
     async function fetchData() {
       try {
-        //fetch all characters data
-        const charactersData = await fetch("https://swapi.dev/api/people/");
+        //fetch data for multiple characters
+        const charactersData = await fetch(URL);
         const characters = await charactersData.json();
-        setCharacters(characters.results);
+        if (!isCancelled) {
+          setCharacters(characters.results);
+        }
 
-        //fetch all films using multiple endpoints from previous fetch data
+        //fetch all planets using multiple endpoints from previous fetch data
         const planetsData = await Promise.all(
           characters.results.map((character) => fetch(character.homeworld))
         );
-        planetsData.forEach((promise) => {
-          getPlanets(promise);
-        });
-
-        setLoading(false);
+        if (!isCancelled) {
+          planetsData.forEach((promise) => {
+            getPlanets(promise);
+          });
+          setLoading(false);
+        }
       } catch (error) {
         setError(error);
       }
     }
     fetchData();
+
+    //cleanup function
+    return () => {
+      isCancelled = true;
+    };
   }, []);
 
   if (loading && !error) {
-    return <p>Loading...</p>;
-  } else if (!loading || (characters && planets && planets.length > 0)) {
-    return characters.map((item, index) => {
-      const id = item.url.slice(29);
+    return <p className={style.loadingFailParagraph}>Loading...</p>;
+  }
+  if (!loading || (characters && planets.length > 0)) {
+    return characters.map((character, index) => {
+      const id = character.url.slice(29);
       return (
-        <div className={style.characterListWrapper} key={item.name}>
+        <div
+          className={style.characterListWrapper}
+          key={character.name + index}
+        >
           <Link className={style.links} to={`/character/${id}`}>
-            {item.name}
+            {character.name}
           </Link>
           <p>Home Planet: {planets[index]}</p>
-          <p>Gender: {item.gender}</p>
+          <p>Gender: {character.gender}</p>
         </div>
       );
     });
-  } else if (error) {
-    return <p>Failed trying to fetch data</p>;
+  }
+  if (error) {
+    return (
+      <p className={style.loadingFailParagraph}>Failed trying to fetch data</p>
+    );
   }
 }

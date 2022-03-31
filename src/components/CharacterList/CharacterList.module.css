@@ -3,8 +3,8 @@
   border-radius: 20px;
   background-color: var(--bg-box);
   text-align: center;
-  -webkit-box-shadow: 5px 5px 14px -2px #5c5c5c;
-  box-shadow: 5px 5px 14px -4px #5c5c5c;
+  -webkit-box-shadow: 5px 5px 20px -3px #000000;
+  box-shadow: 5px 5px 20px -3px #000000;
 }
 .links {
   color: #000;
@@ -14,4 +14,7 @@
 }
 .links:hover {
   text-decoration: underline;
+}
+.loadingFailParagraph {
+  color: var(--white-text);
 }
